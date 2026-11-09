@@ -1,0 +1,189 @@
+{
+  "url": "https://common-test.s0u7a.f5.si",
+  "version": "0.5.2",
+  "status": "passed_with_provider_failure",
+  "workerVersion": "5cb9b6c1-6e66-474e-a717-e73f2ca725c3",
+  "theme": "REBELLION",
+  "unitTests": 147,
+  "ui": {
+    "version": "0.5.2",
+    "workerVersion": "5cb9b6c1-6e66-474e-a717-e73f2ca725c3",
+    "unitTests": 147,
+    "externalLLMCalls": 0,
+    "pages": [
+      "home",
+      "question",
+      "correct",
+      "incorrect",
+      "summary",
+      "成績",
+      "アイテム",
+      "ランキング",
+      "設定",
+      "login"
+    ],
+    "mobileWidths": [320, 390],
+    "theme": "REBELLION",
+    "themeLoaded": true,
+    "levelUp": true,
+    "comboMilestone": true,
+    "reducedMotion": true,
+    "goalSaved": true,
+    "browserErrors": 0,
+    "verifiedAt": "2026-10-18T23:56:36.686Z",
+    "status": "passed",
+    "temporaryDataRemoved": true
+  },
+  "diversity": {
+    "fixedRandomPlans": 80,
+    "uniqueRecipes": 80,
+    "focusCounts": [20, 20, 20, 20],
+    "approachCounts": [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+    "scenarioCounts": [10, 10, 10, 10, 10, 10, 10, 10],
+    "liveBufferedQuestions": 5,
+    "liveBufferedUnits": 5,
+    "approachTypes": 10,
+    "contextsPerSubject": 8,
+    "editorialExamples": 25
+  },
+  "generation": {
+    "initialFiveJobCheck": {
+      "version": "0.5.2",
+      "status": "failed",
+      "maximumPaidJobs": 5,
+      "workerVersion": "5cb9b6c1-6e66-474e-a717-e73f2ca725c3",
+      "paidJobs": 5,
+      "jobs": [
+        {
+          "state": "complete",
+          "inputTokens": 5193,
+          "outputTokens": 4080
+        },
+        {
+          "state": "complete",
+          "inputTokens": 5425,
+          "outputTokens": 4143
+        },
+        {
+          "state": "complete",
+          "inputTokens": 5417,
+          "outputTokens": 1736
+        },
+        {
+          "state": "complete",
+          "inputTokens": 5395,
+          "outputTokens": 2407
+        },
+        {
+          "state": "failed",
+          "inputTokens": null,
+          "outputTokens": null
+        }
+      ],
+      "buffer": {
+        "target": 5,
+        "ready": 4,
+        "pending": 0,
+        "failed": 1
+      },
+      "milliseconds": 288262,
+      "failure": "Generation failed\n\n1 !== 0\n",
+      "temporaryDataRemoved": true
+    },
+    "singleJobFollowUp": {
+      "version": "0.5.2",
+      "status": "passed",
+      "maximumPaidJobs": 1,
+      "fixturePositions": 4,
+      "workerVersion": "5cb9b6c1-6e66-474e-a717-e73f2ca725c3",
+      "paidJobs": 1,
+      "jobs": [
+        {
+          "state": "complete",
+          "inputTokens": 5363,
+          "outputTokens": 2562,
+          "errorCategory": null
+        }
+      ],
+      "buffer": {
+        "target": 5,
+        "ready": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "milliseconds": 66234,
+      "uniqueUnits": 5,
+      "uniqueRecipes": 5,
+      "units": [
+        {
+          "subject": "math1",
+          "topic": "二次関数",
+          "focus": "",
+          "approach": "",
+          "scenario": ""
+        },
+        {
+          "subject": "math1",
+          "topic": "確率",
+          "focus": "",
+          "approach": "",
+          "scenario": ""
+        },
+        {
+          "subject": "math1",
+          "topic": "集合",
+          "focus": "",
+          "approach": "",
+          "scenario": ""
+        },
+        {
+          "subject": "english",
+          "topic": "語彙",
+          "focus": "",
+          "approach": "",
+          "scenario": ""
+        },
+        {
+          "subject": "biology",
+          "topic": "細胞と分子",
+          "focus": "酵素の働き",
+          "approach": "概念の比較",
+          "scenario": "身近な現象のモデル"
+        }
+      ],
+      "verifiedAt": "2026-10-19T00:06:08.240Z",
+      "temporaryDataRemoved": true
+    },
+    "totalPaidJobs": 6,
+    "completedGeneratedQuestions": 5,
+    "failedTrials": 1,
+    "manuallyReviewedQuestions": 1,
+    "manualReview": {
+      "subject": "biology",
+      "topic": "細胞と分子",
+      "focus": "酵素の働き",
+      "approach": "概念の比較",
+      "scenario": "身近な現象のモデル",
+      "planReflectedInQuestion": true
+    }
+  },
+  "localChecks": {
+    "typecheck": "passed",
+    "unitTests": 147,
+    "frontendBuild": "passed",
+    "cloudflareBuild": "passed",
+    "browser": "passed",
+    "workersD1QueuesBrowser": "passed",
+    "primaryTextContrast": ">=4.5:1",
+    "sourceFilesMatched": 105,
+    "migrations": "0001-0011 (unchanged)"
+  },
+  "temporaryDataRemoved": true,
+  "verifiedAt": "2026-10-19T00:06:08.240Z",
+  "limits": [
+    "Learning priorities and mastery thresholds are operating heuristics, not a validated exam score predictor.",
+    "Reading only; listening and full exam-length tasks require complementary practice.",
+    "The initial five-job model check completed four questions; one model call failed before a usable response and its usage is unknown. A separate one-job follow-up succeeded, with four existing fixtures occupying the other buffer positions.",
+    "Manual content review covered one newly generated biology question; this is not a full curriculum quality evaluation."
+  ]
+}

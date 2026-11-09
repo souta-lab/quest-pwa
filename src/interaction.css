@@ -1,0 +1,348 @@
+.question-enter {
+  animation: question-arrive 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.question-enter .option {
+  animation: option-arrive 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: var(--option-delay, 0ms);
+}
+@keyframes question-arrive {
+  from {
+    opacity: 0.45;
+    transform: translateY(12px) scale(0.992);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes option-arrive {
+  from {
+    opacity: 0.5;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.button,
+.tool-button,
+.option,
+.chip {
+  transition:
+    transform 160ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    border-radius 180ms ease;
+}
+.button:active:not(:disabled),
+.tool-button:active:not(:disabled),
+.chip:active:not(:disabled) {
+  transform: scale(0.975);
+  border-radius: 12px;
+}
+.option:active:not(:disabled) {
+  transform: scale(0.989);
+}
+.progress > span {
+  transition: width 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.answer-result {
+  position: relative;
+  isolation: isolate;
+}
+.answer-result.right .result-title > span {
+  animation: success-ring 550ms ease-out;
+}
+@keyframes success-ring {
+  0% {
+    box-shadow: 0 0 0 0 #2c8a6555;
+    transform: scale(0.8);
+  }
+  60% {
+    transform: scale(1.1);
+  }
+  100% {
+    box-shadow: 0 0 0 16px #2c8a6500;
+    transform: scale(1);
+  }
+}
+.reward-effects {
+  margin: 10px 0 14px;
+  position: relative;
+}
+.reward-gain {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: #245c48;
+  font-family: "Outfit", sans-serif;
+  animation: xp-arrive 450ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.reward-gain svg {
+  align-self: center;
+}
+.reward-gain strong {
+  font-size: 26px;
+  font-variant-numeric: tabular-nums;
+  min-width: 2ch;
+}
+.reward-gain > span {
+  font-size: 12px;
+  font-weight: 700;
+}
+@keyframes xp-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.reward-particles {
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 12px;
+  width: 1px;
+  height: 1px;
+  z-index: -1;
+}
+.reward-particles i {
+  position: absolute;
+  width: 6px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--tone);
+  animation: reward-burst 800ms ease-out var(--delay) both;
+}
+@keyframes reward-burst {
+  0% {
+    opacity: 0;
+    transform: translate(0, 12px) rotate(0);
+  }
+  20% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) rotate(var(--r));
+  }
+}
+.reward-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 5px;
+}
+.reward-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border-radius: 16px 16px 16px 5px;
+  background: #e2f0e6;
+  color: #234c3d;
+  font-size: 12px;
+  font-weight: 700;
+  animation: badge-arrive 380ms cubic-bezier(0.15, 1.3, 0.45, 1) both;
+}
+.reward-badge.level,
+.reward-badge.drop {
+  background: #fae8c3;
+  color: #624409;
+}
+.reward-badge.combo {
+  background: #f7e6d8;
+  color: #703f20;
+}
+@keyframes badge-arrive {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.buffer-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #436154;
+  font-size: 11px;
+}
+.buffer-indicator::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: #52775d;
+  border-radius: 50%;
+}
+.chat-log {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0 14px;
+}
+.chat-bubble {
+  border-radius: 19px 19px 19px 5px;
+  padding: 13px 15px;
+  background: #edf2e9;
+  color: #243a2e;
+  animation: xp-arrive 200ms ease both;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.chat-bubble.user {
+  align-self: flex-end;
+  max-width: 94%;
+  border-radius: 19px 19px 5px 19px;
+  background: #dbeade;
+}
+.chat-bubble > strong {
+  font-size: 11px;
+  color: #506554;
+  letter-spacing: 0.04em;
+}
+.chat-prose p {
+  white-space: pre-wrap;
+  line-height: 1.85;
+  font-size: 14px;
+  margin: 7px 0 0;
+}
+.chat-prose p + p {
+  margin-top: 13px;
+}
+.chat-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #49604e;
+  margin: 9px 0 0;
+}
+.thinking-dots {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.thinking-dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: thinking-dot 1.4s ease-in-out infinite;
+}
+.thinking-dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.thinking-dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes thinking-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+.chat-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 14px;
+}
+.chat-suggestions .chip {
+  padding: 7px 10px;
+  font-size: 11px;
+  background: transparent;
+  border: 1px solid #a2b2a0;
+  color: #354d3a;
+  border-radius: 20px;
+  cursor: pointer;
+}
+.chat-input-help {
+  color: #53634e;
+  font-size: 10px;
+}
+.connection-banner {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 10px 18px;
+  background: #fae8c3;
+  color: #624409;
+  text-align: center;
+  font-size: 12px;
+}
+.release-label {
+  font-size: 11px;
+  color: #52614e;
+  text-align: center;
+  padding: 15px;
+}
+.hint-panel > .section-title {
+  position: sticky;
+  top: -1px;
+  z-index: 3;
+  background: #fcfdf6;
+  padding: 8px 0;
+}
+.hint-recap {
+  margin: 14px 0;
+  border: 1px solid #bac9b5;
+  border-radius: 16px;
+  padding: 12px;
+}
+.hint-recap summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  color: #34543f;
+}
+.hint-recap .hint-response {
+  margin-bottom: 0;
+}
+.reduce-motion .reward-particles {
+  display: none;
+}
+.reduce-motion .question-enter,
+.reduce-motion .option,
+.reduce-motion .reward-gain,
+.reduce-motion .reward-badge,
+.reduce-motion .chat-bubble,
+.reduce-motion .thinking-dots i {
+  animation: none !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reward-particles {
+    display: none;
+  }
+  .question-enter,
+  .option,
+  .reward-gain,
+  .reward-badge,
+  .chat-bubble,
+  .thinking-dots i {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@media (max-width: 480px) {
+  .buffer-indicator {
+    font-size: 10px;
+  }
+  .quiz-top-info {
+    gap: 9px;
+  }
+}

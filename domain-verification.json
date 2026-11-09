@@ -1,0 +1,15 @@
+{
+  "url": "https://common-test.s0u7a.f5.si",
+  "verifiedAt": "2026-10-11T02:41:32.859Z",
+  "status": "passed",
+  "checks": [
+    "custom-domain-HTTPS",
+    "login-new-origin",
+    "secure-host-cookie",
+    "authenticated-api",
+    "mobile-layout",
+    "logout"
+  ],
+  "externalLLMCalls": 0,
+  "emailsSent": 0
+}

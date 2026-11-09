@@ -1,0 +1,49 @@
+{
+  "name": "common-test-pwa",
+  "version": "0.6.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --ip 127.0.0.1 --port 8787 --inspector-port 9230 --var LOCAL_DEV:true",
+    "build": "vite build --mode frontend",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts tests/*.test.tsx",
+    "db:migrate": "wrangler d1 migrations apply DB --local",
+    "check": "npm run typecheck && npm test && npm run build",
+    "generate": "node --import tsx scripts/generate.ts",
+    "deploy": "cf deploy",
+    "import:questions": "node --import tsx scripts/import-questions.ts",
+    "test:e2e": "node --import tsx scripts/smoke.mjs",
+    "test:live": "node --import tsx scripts/live-smoke.mjs",
+    "build:cloudflare": "cf build",
+    "db:migrate:remote": "cf d1 migrations apply f8ce7651-89f2-44fe-9ac9-a6d96a5e81ff --dir migrations"
+  },
+  "dependencies": {
+    "@fontsource/noto-sans-jp": "^5.3.0",
+    "@fontsource/outfit": "^5.3.0",
+    "katex": "^0.19.0",
+    "lucide-react": "^1.52.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "ts-fsrs": "^5.4.2",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^2.0.0-beta.sha-91c870c02",
+    "@cloudflare/workers-types": "^5.20261005.1",
+    "@playwright/test": "^1.63.0",
+    "@sparticuz/chromium": "^153.0.0",
+    "@types/katex": "^0.16.8",
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "cf": "^1.0.0-beta.14",
+    "esbuild": "0.28.2",
+    "miniflare": "5.20261001.0-alpha",
+    "prettier": "^3.9.9",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2",
+    "wrangler": "^4.147.0"
+  }
+}

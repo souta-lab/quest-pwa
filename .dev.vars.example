@@ -1,0 +1,7 @@
+# Local-only. Generate ENCRYPTION_KEY using: openssl rand -base64 32
+ENCRYPTION_KEY=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+# Resend: verified sender required for account emails in production
+RESEND_API_KEY=
+MAIL_FROM=

@@ -1,0 +1,759 @@
+/* REBELLION / Reject the verdict. Keep the next action unmistakable. */
+:root {
+  --night: #090a0e;
+  --panel: #171920;
+  --ink: #191b24;
+  --paper: #f4f5f8;
+  --paper-muted: #555967;
+  --heat: #ff3d43;
+  --heat-light: #ffa5ac;
+  --primary: var(--heat);
+  --lime: var(--heat);
+  --line: #d5d8e1;
+  --muted: var(--paper-muted);
+  --md-sys-color-primary: #b51b28;
+  --md-sys-color-primary-container: #f9dbdd;
+  --md-sys-color-on-primary-container: #3c3f4b;
+  --md-sys-color-surface: var(--paper);
+  --md-sys-color-on-surface: var(--ink);
+  --md-sys-color-on-surface-variant: var(--paper-muted);
+  background: var(--night);
+}
+::selection {
+  background: #ff3d43;
+  color: #09090b;
+}
+.workspace {
+  background: #101218;
+  color: #f4f5fa;
+}
+.sidebar {
+  background: #090a0f;
+  border-color: #363841;
+}
+.brand {
+  letter-spacing: 4px;
+}
+.brand-mark {
+  border-radius: 3px 13px 3px 13px;
+  color: #0b0b0d;
+  transform: rotate(-5deg);
+}
+.sidebar-caption {
+  color: #a1a4b0;
+  letter-spacing: 1.4px;
+}
+.sidebar nav button {
+  border-radius: 5px 15px 5px 15px;
+}
+.sidebar nav button.active {
+  background: #f1f2f7;
+  color: #171923;
+  box-shadow: -5px 0 0 var(--heat);
+}
+.sidebar nav button:hover:not(.active) {
+  background: #262933;
+}
+.sidebar nav .active b {
+  background: #f8cace;
+  color: #32343e;
+}
+.tiny-card {
+  border: 1px solid #3b3e4a;
+  border-left: 3px solid var(--heat);
+  border-radius: 3px 17px 3px 17px;
+  background: #19141d;
+}
+.tiny-card strong {
+  font-size: 14px;
+}
+.tiny-card p,
+.account small {
+  color: #babcca;
+}
+.avatar {
+  background: #292c37;
+  color: #e3e5ef;
+}
+.topbar {
+  background: #0c0d12;
+  border-color: #373a45;
+}
+.top-context {
+  color: #afb3c3;
+  font:
+    500 10px Outfit,
+    sans-serif;
+  letter-spacing: 0.7px;
+}
+.top-level {
+  color: #f3f4f9;
+}
+.top-actions .icon-button {
+  color: #d2d5e0;
+}
+.top-actions .icon-button:hover {
+  background: #2b2e3a;
+}
+.page-heading h1 {
+  font-weight: 900;
+}
+.page-heading .eyebrow {
+  color: #ffa1a9;
+}
+.page-heading p {
+  color: #bec1ce;
+}
+.button {
+  border-radius: 5px 17px 5px 17px;
+}
+.button.primary,
+.button.lime {
+  background: #ff3d43;
+  color: #0d0e11;
+  border: 1px solid #ff3d43;
+}
+.button.primary:hover:not(:disabled),
+.button.lime:hover:not(:disabled) {
+  background: #ff7681;
+  border-color: #ff7681;
+  box-shadow: 4px 4px 0 #3b3d49;
+}
+.button.outlined {
+  border-color: #9299ac;
+}
+.pill {
+  border-radius: 4px;
+}
+.card,
+.metric,
+.learning-metrics > div {
+  border-radius: 6px 22px 6px 22px;
+}
+.card .eyebrow {
+  color: #a61a26;
+}
+.app-footer,
+.content > .muted,
+.release-label {
+  color: #b3b6c4;
+}
+.study-heading {
+  gap: 20px;
+  align-items: flex-end;
+  margin-bottom: 29px;
+}
+.study-heading .eyebrow {
+  font:
+    700 10px Outfit,
+    sans-serif;
+  letter-spacing: 2.2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.study-heading .eyebrow i {
+  width: 7px;
+  height: 7px;
+  background: var(--heat);
+  transform: rotate(45deg);
+}
+.study-heading h1 {
+  font-size: clamp(48px, 5.9vw, 78px);
+  font-weight: 900;
+  letter-spacing: -0.075em;
+  line-height: 1.1;
+  margin: 23px 0 19px;
+}
+.study-heading h1 span {
+  display: inline-block;
+  color: #ff3d43;
+  margin-left: 0.07em;
+  position: relative;
+}
+.study-heading h1 span::after {
+  content: "";
+  position: absolute;
+  height: 5px;
+  background: #ff3d43;
+  bottom: -8px;
+  right: 0;
+  width: 90%;
+  transform: rotate(-3deg);
+}
+.study-heading .ignition-message {
+  color: #c5c7d2;
+  font-size: 12px;
+}
+.exam-countdown {
+  color: #e2e4ed;
+  background: #191c25;
+  border-color: #3f424f;
+  border-radius: 4px 14px 4px 14px;
+  margin-bottom: 4px;
+}
+.exam-countdown b {
+  color: #fff;
+}
+.study-hero {
+  background: #171920;
+  border: 1px solid #636776;
+  border-radius: 5px 30px 5px 30px;
+  padding: 30px 34px 26px;
+  box-shadow: 8px 8px 0 #07080c;
+}
+.study-hero::before {
+  background: #ff3d43;
+  width: 6px;
+}
+.study-hero::after {
+  background: repeating-linear-gradient(
+    125deg,
+    transparent 0 14px,
+    #ff45540b 14px 16px
+  );
+  width: 39%;
+}
+.study-hero-top .pill.light {
+  background: #e9eaf0;
+  color: #1c1f2b;
+  border-color: #e9eaf0;
+  font-size: 10px;
+  font-weight: 700;
+}
+.study-hero-top > span:last-child {
+  color: #c2c6d3;
+}
+.mission-label {
+  color: #ff9ca4;
+  font-family: ui-monospace, monospace;
+  letter-spacing: 1.4px;
+  font-size: 10px;
+  margin-top: 26px;
+}
+.study-subject {
+  color: #babfce;
+}
+.study-hero h2 {
+  color: #f7f8fc;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+.study-reason {
+  color: #d5d8e3;
+}
+.study-start-row .goal-picker legend {
+  color: #bcc1d0;
+}
+.study-start-row .goal-picker button {
+  background: #232631;
+  color: #e2e5ee;
+  border-color: #818797;
+  border-radius: 5px 12px 5px 12px;
+}
+.study-start-row .goal-picker button[aria-pressed="true"] {
+  background: #f3f4f9;
+  color: #181b24;
+  border-color: #f3f4f9;
+  box-shadow: 0 3px 0 #ff3d43;
+}
+.study-start-row .start-button {
+  background: #ff3d43;
+  color: #0d0e11;
+  border-color: #ff3d43;
+  min-width: 230px;
+  box-shadow: 4px 4px 0 #414451;
+  font-weight: 900;
+}
+.study-hero > small,
+.study-route {
+  color: #bfc4d2;
+}
+.study-route svg {
+  color: #ff9fa7;
+}
+.mission-art {
+  width: 29%;
+  right: 3%;
+  top: 20%;
+  transform: rotate(-6deg);
+}
+.mission-art svg {
+  stroke: #969daf;
+  opacity: 0.45;
+}
+.mission-art .mission-arc {
+  stroke: #ff3d43;
+  stroke-width: 9;
+}
+.mission-art > span {
+  position: relative;
+  z-index: 1;
+  color: #f9e9ea;
+  background: #9d1d28;
+  padding: 5px 9px;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+.mission-art b {
+  position: relative;
+  z-index: 1;
+  color: #e9eaf3;
+  -webkit-text-stroke: 1px #e9eaf3;
+  font-size: clamp(74px, 8.5vw, 122px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.075em;
+  text-shadow: 6px 6px 0 #3a3c48;
+}
+.mission-art small {
+  position: relative;
+  z-index: 1;
+  color: #d3d6e2;
+  font-size: 8px;
+  letter-spacing: 2px;
+}
+.today-card,
+.study-link-card,
+.study-level-card {
+  background: #191c24;
+  color: #f0f2f9;
+  border-color: #444b5c;
+  border-radius: 5px 22px 5px 22px;
+}
+.today-icon {
+  background: #2d2f39;
+  color: #ff9ea6;
+  border-radius: 5px 13px 5px 13px;
+}
+.today-card p,
+.today-time small,
+.study-link-card p,
+.study-link-card div > span,
+.study-level-card span {
+  color: #bfc4d3;
+}
+.today-card b {
+  color: #ffadb4;
+}
+.today-time > span {
+  color: #e2e5ee;
+}
+.today-time progress::-webkit-progress-bar,
+.study-level-card progress::-webkit-progress-bar {
+  background: #393d4b;
+}
+.today-time progress::-webkit-progress-value,
+.study-level-card progress::-webkit-progress-value {
+  background: #ff3d43;
+}
+.study-link-card strong {
+  color: #f0f2f9;
+}
+.study-link-card:hover {
+  background: #22232a;
+  border-color: #ce4954;
+}
+.study-card-icon,
+.study-level-card > svg {
+  color: #ff9da5;
+}
+.study-level-card > b {
+  border-radius: 5px 14px 5px 14px;
+  color: #ffb1b7;
+  background: #2c2e37;
+  border-color: #995359;
+}
+.quiz-top .text-button,
+.quiz-top .icon-button {
+  color: #d9deed;
+}
+.quiz-top-info > span,
+.quiz-top-info .boost-indicator,
+.buffer-indicator {
+  color: #ff9fa7;
+}
+.focus-progress,
+.focus-progress.goal-complete {
+  background: #1b1d27;
+  color: #edf0f8;
+  border-color: #774347;
+  border-radius: 5px 18px 5px 18px;
+}
+.focus-progress > span {
+  color: #ffacb3;
+}
+.focus-progress strong small {
+  color: #c8cede;
+}
+.focus-progress progress::-webkit-progress-bar {
+  background: #3b3e4d;
+}
+.question-card {
+  background: #f4f5f8;
+  border-color: #bfc4d2;
+  border-radius: 7px 23px 7px 23px;
+}
+.question-stem,
+.explanation p {
+  color: #191d29;
+}
+.subject-badge {
+  background: #f4d7d9 !important;
+  color: #414452;
+  border-radius: 4px;
+}
+.question-meta,
+.question-topic,
+.question-details,
+.difficulty {
+  color: #596173;
+}
+.study-context {
+  color: #5a6173;
+}
+.study-context > span {
+  color: #a21c27;
+}
+.option {
+  border-radius: 5px 14px 5px 14px;
+}
+.option:hover:not(:disabled) {
+  background: #fce6e8;
+  border-color: #b52632;
+}
+.tool-button,
+.tool-button.selected,
+.hint-trigger {
+  background: #f5dfe1;
+  color: #404350;
+  border-color: #bc8d91;
+}
+.answer-result {
+  background: #1c1a25;
+  border: 1px solid #e65561;
+  border-radius: 5px 20px 5px 20px;
+}
+.answer-result.right .result-title > span {
+  color: #0f1013;
+  background: #ff3d43;
+  border-radius: 4px 13px 4px 13px;
+}
+.result-kicker {
+  color: #ff9da5;
+  letter-spacing: 2px;
+}
+.result-title h3 {
+  font-weight: 900;
+}
+.result-title p,
+.feedback-detail,
+.answer-result .next-readiness {
+  color: #d4cbdc;
+}
+.answer-result .text-button {
+  color: #ffb5bb;
+}
+.answer-result .checkpoint-note {
+  color: #f5e0e2;
+  background: #2e3039;
+}
+.focus-quiz .result-actions > .primary {
+  color: #0d0e11;
+  border-radius: 5px 15px 5px 15px;
+}
+.focus-quiz .result-actions > .checkpoint-finish {
+  color: #e6dcec;
+  border-color: #a78386;
+}
+.answer-result.incorrect {
+  color: #2d2637;
+  background: #eee9f2;
+  border-color: #bda4a6;
+}
+.incorrect .feedback-detail,
+.incorrect .next-readiness {
+  color: #6b5254;
+}
+.incorrect .result-kicker,
+.incorrect .result-title p {
+  color: #794448;
+}
+.incorrect .text-button {
+  color: #4d5060;
+}
+.incorrect .result-title > span {
+  color: #424553;
+  background: #dcc3c5;
+}
+.focus-quiz .incorrect .result-actions > .checkpoint-finish {
+  color: #494c5a;
+  border-color: #b89598;
+}
+.reward-gain {
+  color: #f9d5d8;
+  background: #393b47;
+  border-color: #ac686e;
+  border-radius: 4px;
+}
+.reward-badge {
+  color: #f3e5e6;
+  background: #31333d;
+  border-color: #927073;
+  border-radius: 4px 12px 4px 12px;
+}
+.reward-badge.level {
+  background: #defd72;
+  color: #202a08;
+  border-color: #defd72;
+}
+.reward-badge.drop {
+  background: #e9fcb0;
+  color: #29350b;
+  border-color: #c3da80;
+}
+.reward-badge.combo {
+  color: #ffc1c6;
+  background: #33353f;
+  border-color: #a3535a;
+}
+.reward-shockwave {
+  border-radius: 4px;
+  border-color: #ff8b95;
+  animation-name: rebellion-impact;
+}
+.summary-icon {
+  background: #282931;
+  color: #ff9da5;
+  border-color: #c9545e;
+  border-radius: 5px 24px 5px 24px;
+  transform: rotate(-5deg);
+}
+.summary .eyebrow {
+  color: #ff9ea6;
+}
+.summary h1 {
+  font-weight: 900;
+}
+.summary > .muted,
+.summary-learning {
+  color: #c6bfd0;
+}
+.summary-metrics > div {
+  background: #20202d;
+  border-color: #55425f;
+  border-radius: 5px 18px 5px 18px;
+}
+.summary-metrics b {
+  color: #ffadb4;
+}
+.summary-metrics > div span {
+  color: #cfc7da;
+}
+.boost-card {
+  background: #eceef4;
+  border-color: #a6adbd;
+  border-radius: 5px 28px 5px 28px;
+}
+.boost-card .pill {
+  background: #defd72;
+  color: #29310d;
+}
+.boost-card p {
+  color: #565c70;
+}
+.boost-card strong {
+  color: #9b202a;
+}
+.boost-art {
+  color: #ff6370;
+  background: #191721;
+  box-shadow: 7px 7px 0 #b32b36;
+  border-radius: 5px 25px 5px 25px;
+}
+.boost-art span {
+  color: #f3f2fa;
+}
+.toast {
+  color: #f6edee;
+  background: #24252c;
+  border-color: #a6686d;
+  border-radius: 5px 15px 5px 15px;
+}
+.auth-story {
+  background:
+    repeating-linear-gradient(135deg, transparent 0 30px, #ffffff03 30px 31px),
+    #0c0d13;
+  border-color: #424553;
+}
+.auth-story .eyebrow {
+  color: #ff9da5;
+}
+.auth-story h1 {
+  font-weight: 900;
+  line-height: 1.25;
+}
+.auth-story h1 em {
+  color: #ff5260;
+}
+.auth-story p {
+  color: #c6cada;
+}
+.auth-story > small {
+  color: #aeb5c8;
+}
+.auth-form {
+  background: #f0f1f6;
+}
+.auth-card .pill {
+  color: #494c5c;
+  background: #f0d7d9;
+  border-radius: 3px;
+}
+.orbit-center {
+  background: #32343f;
+  color: #ffb0b7;
+  border-color: #aa5057;
+  box-shadow: 9px 9px 0 #22202d;
+  border-radius: 5px 30px 5px 30px;
+}
+.orbit-chip {
+  background: #24202e;
+  color: #f5d5d8;
+  border-color: #865357;
+  border-radius: 4px;
+}
+.orbit-chip small {
+  color: #c2a4a6;
+}
+.orbit-spark {
+  color: #ff707c;
+}
+.bottom-nav {
+  background: #0c0e15;
+  border-color: #4a3c53;
+}
+.bottom-nav button {
+  color: #bfc4d6;
+}
+.bottom-nav button.active {
+  color: #ffb2b8;
+}
+.bottom-nav button.active svg {
+  color: #ff9da5;
+  background: #2e3039;
+  box-shadow: 0 0 0 7px #2e3039;
+  border-radius: 3px 9px 3px 9px;
+}
+@keyframes rebellion-impact {
+  from {
+    opacity: 0.7;
+    transform: rotate(-20deg) scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(12deg) scale(3.4);
+  }
+}
+@media (max-width: 1100px) and (min-width: 801px) {
+  .study-heading h1 {
+    font-size: 52px;
+  }
+  .study-hero {
+    padding: 27px;
+  }
+}
+@media (max-width: 800px) {
+  .study-heading h1 {
+    font-size: 56px;
+  }
+}
+@media (max-width: 580px) {
+  .study-heading {
+    position: relative;
+    display: block;
+    margin-bottom: 23px;
+    padding-top: 1px;
+  }
+  .study-heading .eyebrow {
+    font-size: 8px;
+    letter-spacing: 1.2px;
+    gap: 6px;
+    min-height: 28px;
+  }
+  .study-heading h1 {
+    font-size: clamp(36px, 10.9vw, 53px);
+    margin-top: 22px;
+    margin-bottom: 19px;
+    white-space: nowrap;
+    letter-spacing: -0.08em;
+  }
+  .study-heading h1 span::after {
+    height: 3px;
+    bottom: -5px;
+  }
+  .study-heading .ignition-message {
+    max-width: 310px;
+    font-size: 11px;
+    line-height: 1.9;
+  }
+  .exam-countdown {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 0;
+    padding: 4px 8px;
+    font-size: 9px;
+    gap: 5px;
+  }
+  .exam-countdown b {
+    font-size: 18px;
+  }
+  .exam-countdown > svg {
+    display: none;
+  }
+  .study-hero {
+    padding: 22px 20px;
+    border-radius: 5px 24px 5px 24px;
+    box-shadow: 5px 5px 0 #07080c;
+  }
+  .study-hero::before {
+    width: 4px;
+  }
+  .study-hero h2 {
+    font-size: 30px;
+  }
+  .study-start-row .start-button {
+    min-width: 0;
+    font-size: 16px;
+    min-height: 55px;
+  }
+  .study-start-row .goal-picker button {
+    min-width: 62px;
+  }
+  .study-route {
+    font-size: 9px;
+    gap: 5px;
+  }
+  .today-card,
+  .study-link-card,
+  .study-level-card {
+    border-radius: 5px 18px 5px 18px;
+  }
+  .today-card h3 {
+    font-size: 14px;
+  }
+  .result-title h3 {
+    font-size: 19px;
+  }
+  .summary h1 {
+    font-size: 27px;
+    line-height: 1.55;
+  }
+  .summary-metrics b {
+    font-size: 25px;
+  }
+  .auth-story h1 {
+    font-size: 39px;
+  }
+}
