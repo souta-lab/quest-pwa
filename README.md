@@ -1,16 +1,62 @@
-# QUEST — 共通テスト学習PWA v0.5.2
+<div align="center">
 
-共通テストの得点を伸ばすことを目的に、学習履歴から次の単元と難しさを選ぶPWA。基礎の説明と例題→初見問題を自力で解く→別の資料への応用→FSRSの期日復習をつなぐ。React + TypeScript + Vite、Cloudflare Workers + D1 + Queues、ts-fsrs。
+<img src="public/icon.svg" width="120" alt="QUEST アイコン">
 
-v0.5.2「REBELLION」は、赤・黒・白、太い文字、斜線と切り込む形で全画面を再構成。「その評価、覆せ。」を中心に独自の反骨的なコピーを使う。問題面は読みやすく保ち、開始・次問の操作を明確にする。正解、レベルアップ、コンボは短い演出で示す。
+# ⚔️ QUEST — 共通テスト学習PWA
 
-出題は、科目内で直近4単元を避ける配分、論点×問い方×題材の組み合わせ履歴、科目に合った8種の題材と10種の問い方で分散する。候補が少ない場合は範囲内で続けられ、期限復習・配点・基礎の優先度は維持する。10-shotの見本は25問から作問IDごとに入れ替える。保存済み問題は予定した論点・問い方・題材に一致するものを再利用し、一致しなければ新しく作るため、以前より生成回数が増える場合がある。数値・変数だけの類題の検出と、同じ単元16問＋同科目の別単元8問を参照する検査で、同型問題を抑える。意味上の類似を完全に判定する仕組みではない。
+### 「その評価、覆せ。」
 
-v0.5では均等ランダム出題・復習1割を、基礎のつながり・最近の成績・配点・復習期限を使う出題へ変更。受験日、目標得点率、1日の時間の目安、科目の配点、数学ⅡBCの選択3項目を設定できる。過去問・模試の実測得点を保存し、AI短問内の正答率と分けて表示する。学習の効果と配分係数は未検証のため、推定得点や偏差値を作らない。
+学習履歴から「次に解くべき一問」を選ぶ、共通テスト特化の学習PWA。
+**基礎の理解 → 初見問題を自力で解く → 応用 → FSRSの期日復習** を一つの流れにつなぐ。
 
-本人試用版をCloudflareへ配置済み：**https://common-test.s0u7a.f5.si**。2026-10-11（日本時間）にHTTPSでログイン・回答・復習・メモ・BYOK設定を確認した。カスタムドメインへの切替後もHTTPS・本人ログイン・セッション・認証済みAPI・スマホ表示を確認した。Googleログインは未設定。確認・再設定メールの送信元は設定済み（実送信・受信は未検証）。本人用アカウントを用意し、ログイン情報をPCの `/home/s0u7a/projects/quest-pwa/.deploy/LOGIN.txt` に保存した。パスワードと暗号鍵はソースに含めない。
+![version](https://img.shields.io/badge/version-v0.5.2_%22REBELLION%22-b91c1c)
+[![Live](https://img.shields.io/badge/🌐_Live-common--test.s0u7a.f5.si-111111)](https://common-test.s0u7a.f5.si)
+![React](https://img.shields.io/badge/React-20232a?logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)
+![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=fff)
+![Cloudflare Workers](https://img.shields.io/badge/Cloudflare_Workers-F38020?logo=cloudflareworkers&logoColor=fff)
+![D1](https://img.shields.io/badge/D1_SQLite-F38020?logo=sqlite&logoColor=fff)
+![ts-fsrs](https://img.shields.io/badge/FSRS-ts--fsrs-0f766e)
 
-## 起動と新問生成
+🌐 **[今すぐ使う](https://common-test.s0u7a.f5.si)** ・ 📐 [設計 DESIGN.md](DESIGN.md) ・ 🧪 [動機づけ設計 MOTIVATION_DESIGN.md](MOTIVATION_DESIGN.md) ・ 🚀 [配置記録 DEPLOYMENT.md](DEPLOYMENT.md)
+
+</div>
+
+## 📸 スクリーンショット
+
+<div align="center">
+
+<img src="screenshots/v051-production-home-desktop.png" width="720" alt="ホーム画面（デスクトップ）">
+
+<img src="screenshots/v051-production-question.png" width="220" alt="問題画面"> <img src="screenshots/course-map-320.png" width="220" alt="単元マップ"> <img src="screenshots/stats-mobile.png" width="220" alt="成績画面">
+
+</div>
+
+## ✨ 特徴
+
+- 🧠 **適応型の出題** — 前提知識・自力正解・単元の間隔・配点・直近の成績から優先度を決定。新問9割／期限復習1割を基本に、直近の単元・論点×問い方×題材の偏りを抑える
+- 🔁 **FSRS期日復習** — ts-fsrs（保持率90%）で復習期日を管理。「覚えてなかった」はFSRSをAgainへ訂正し、元の正誤・XPは保持
+- 🤖 **BYOKのLLM新問生成** — OpenAI互換／Anthropic互換の接続先を自分のキーで設定。作問→正解を伏せた独立検証→一致した問題だけ保存、の2段構え。共有には運営の校閲・承認が必須
+- 🎓 **教材と段階ヒント** — 単元別の基礎教材＋3段階ヒント（着眼点→知識→使い方）。AIヒントも正解漏れ検査を通ったものだけ表示
+- 🎮 **継続の仕掛け** — XP・レベル・コンボ・4系統の称号・ブースト抽選。ただし推定得点や偏差値などの架空の数値は出さない
+- ✍️ **手書きメモ＆KaTeX** — ペン／消しゴム付きメモを端末下書き＋サーバー同期。数式はKaTeX表示
+- 🔐 **セキュリティ** — BYOKキーは暗号化保存し、API応答に正解・キーを含めない。パスワードはPBKDF2+HMAC、各種レート制限とCSP等のヘッダ適用済み
+
+## 🛠 技術スタック
+
+| 領域 | 採用技術 |
+| --- | --- |
+| フロントエンド | React + TypeScript + Vite、KaTeX、Lucide、Noto Sans JP / Outfit |
+| バックエンド | Cloudflare Workers + D1 + Queues |
+| 学習アルゴリズム | ts-fsrs（FSRS）、簡易3PL形の学力レート更新 |
+| テスト | Vitest系ユニット（100件超）+ Playwright E2E（実Workers/D1/Queues、LLMはモック） |
+| 配置 | Cloudflare（カスタムドメイン `common-test.s0u7a.f5.si`） |
+
+> ⚠️ 現在は**本人試用版**。単元マップは15科目枠の初期版で、全範囲の網羅性と生成難度の校正は未完。生成問題は「AI生成・解答チェック済み・人による校閲なし」と明示して出題する。
+
+---
+
+## 🚀 起動と新問生成
 
 作問ごとに見本の順序も変えるため、固定した10-shotより入力キャッシュが再利用されにくい場合がある。
 
@@ -33,7 +79,7 @@ npm run dev
 
 解いている間に、生成モードでは次の問題を最大5問までサーバーに保持し、使った分を順次補充する。直後の1問はブラウザにも先読みし、切替時に表示する。5問の準備を始めると、終了後もその分の作問が続く場合がある。待機中はXPブーストの時間を消費しない。JSONの形式不備は1回だけ修復し、独立検証を通してから保存する。通信エラーや解答検証失敗の有料自動再試行は行わない。
 
-## 生成と品質の扱い
+## 🧪 生成と品質の扱い
 
 - 前提知識、自力正解、単元の間隔、直近の配分、科目の配点、直近60日の計時した過去問成績から優先度を決める。期限復習は通常は新問2問ごと、大きな残量（12問以上）では交互。新問が尽きた保存済みモードは、期限到来済みの復習を続けられる。回答後10分の同一問除外とFSRS期限を守る
 - 科目・単元・難度を運営のハーネスで決め、文章・数式だけの4択を生成。想定3分以内で回答の時間制限なし
@@ -47,7 +93,7 @@ npm run dev
 
 現在の単元マップは15科目枠の初期版。全教科・全範囲の網羅性と、生成難度の校正は未完。数学Ⅰ単独・組合せ社会科目・英語以外の外国語などのカタログ追加、リスニング・厳密な図形やグラフは後続対応。
 
-## 学習・ゲーム機能
+## 🎮 学習・ゲーム機能
 
 - メール・パスワード認証、メール確認、パスワード再設定、セッション、ログアウト。Google OAuthはクライアント設定が必要
 - 文系・理系プリセット、科目選択、理科基礎2範囲を1科目として抽選
@@ -68,7 +114,7 @@ npm run dev
 
 学力レートは初見・補助なしを使う簡易3PL形の更新で、正式なIRT校正ではない。生成問題の難度タグだけでは利用者間の公平な比較は保証できない。共通の基準問題・母集団・実際の模試記録を蓄積して校正する必要がある。偏差値、共テ得点率、駿台/進研/全統換算は校正不足として表示し、架空の数値を入れない。
 
-## 保存済みの初期問題とバッチCLI
+## 📦 保存済みの初期問題とバッチCLI
 
 生成OFF・切替時に使う15科目枠・49問のオリジナル動作確認問題を同梱。1万問を事前作成することは、今回の版の利用開始条件から外した。初期49問も全範囲を網羅する問題集ではない。
 
@@ -88,7 +134,7 @@ npm run db:migrate
 
 バッチには`GENERATION_API_KEY`、`GENERATION_MODEL`、`VERIFICATION_MODEL`を設定する。OpenAI互換形式、最大500問、既定の使用トークン停止目安10万（`MAX_BATCH_TOKENS`で変更）。`review_required`に保存し、モデル一致だけでは取り込まない。入力分を含む厳密な予算上限ではない。ライブ生成の上限設定とは別。
 
-## Cloudflareへの配置
+## ☁️ Cloudflareへの配置
 
 配置PCのソースは `/home/s0u7a/projects/quest-pwa`。`cf` CLIを使用し、Workersの `quest-pwa`、D1の `quest-pwa`、Queuesの `quest-generation` を作成した。`0001`〜`0011`は本番に適用済み。Queueのproducerとconsumerも接続済み。カスタムドメインは `common-test.s0u7a.f5.si`。本番のAPP_ORIGINを同じHTTPS URLに設定し、workers.devでの公開を停止した。
 
@@ -116,7 +162,7 @@ OpenAIの公式エンドポイントでは`max_completion_tokens`、その他の
 
 ResendキーはWorkerのsecretに登録済みで、再配置用の保護ファイルにも引き継いだ。送信ドメインのDNSを設定し、本人からResendの認証完了を確認した。MAIL_FROMは `QUEST <noreply@common-test.s0u7a.f5.si>` として本番・再配置用設定に登録済み。Google・メールの実送信と受信確認・実LLMの有料接続は未実施。公開用の新規登録・再設定にはメール設定が必要で、未設定時はエラーを返す。本人試用では個別に作成した確認済みアカウントを使う。暗号鍵を失うと保存済みキーを復号できない。自動ローテーション・マルチキー移行は未実装。
 
-## 検証
+## ✅ 検証
 
 ```bash
 npm run check
@@ -132,7 +178,7 @@ npm run test:live
 
 Playwrightと`@sparticuz/chromium`を使用。必要に応じて`CHROMIUM_PATH`にChrome/Chromiumの実行ファイルを指定する。通常E2EのテストアカウントはローカルD1に残る。
 
-## 残る実装課題
+## ⚠️ 残る実装課題
 
 v0.2以降は問題・プロフィール・回答・FSRSカード・現在の問題/メモを別テーブルに保存する。`0002`で旧JSONを移行し、旧`learning_states`は移行バックアップとして残す。旧版へのロールバック時に最新履歴が自動復元される仕組みではない。
 
@@ -144,7 +190,7 @@ AIヒントは本文が正常に届いたときだけ使用扱いにする。通
 
 Material 3 Expressiveの形・色・強弱・動きを採用した独自React UIで、公式コンポーネントの完全な適合監査は未実施。厳密なバネ物理・動的カラーテーマ、アカウント連携・削除、模試記録/校正、管理画面、専門家による教材確認、数式の自動検算、意味上の類題検出、プロンプト版管理、課金額予算は後続対応。
 
-## 参照
+## 📚 参照
 
 - [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/)
 - [D1 batch transactions](https://developers.cloudflare.com/d1/worker-api/d1-database/#batch)
