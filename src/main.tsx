@@ -68,6 +68,7 @@ import "./study.css";
 import "./ignition.css";
 import "./rebellion.css";
 import "./course.css";
+import "./family.css";
 import { CoursePage, CourseTrail, RecallGate } from "./CoursePage";
 import {
   StudyHome,

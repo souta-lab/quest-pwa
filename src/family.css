@@ -1,0 +1,73 @@
+/* Family layer — s0u7a properties shared discipline.
+   ポートフォリオ（s0u7a.f5.si）と共通の基盤を、QUESTのREBELLIONテーマの
+   上に重ねる: 書体の規律、余白のスケール、ヘアライン、モノスペースのラベル。
+   色（赤・黒・白）と非対称の形、ハードシャドウはREBELLIONのまま維持する。 */
+
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --font-mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+body {
+  line-height: 1.75;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.04em;
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--heat);
+  color: #fff;
+}
+
+/* ラベルはサイトと共通のモノスペース小文字 */
+.eyebrow,
+.question-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.brand {
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+
+/* フレームはヘアラインで区切る（サイトのヘッダー／フッターと同型） */
+.topbar {
+  border-bottom: 1px solid var(--line);
+}
+
+.bottom-nav {
+  border-top: 1px solid var(--line);
+}
+
+.app-footer {
+  border-top: 1px solid var(--line);
+}
+
+/* 問題を読む面は、サイトの本文と同じ行間まで広げて静けさを保つ */
+.question-stem {
+  line-height: 1.95;
+}
+
+.button {
+  letter-spacing: 0.02em;
+}
+
+/* フォーム要素は形の主張を抑え、罫線で揃える */
+input,
+select,
+textarea {
+  border-color: var(--line);
+}
