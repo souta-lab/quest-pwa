@@ -5,7 +5,6 @@ import { fixture } from "./d1-fixture";
 import { hash, seal } from "../worker/security";
 import { load, mutate } from "../worker/repository";
 import { next, answer, attachBank } from "../worker/engine";
-import { defaultHint } from "../worker/hints";
 import { renderQuestionHint } from "../worker/question-hints";
 import { bank } from "../worker/bank";
 import { readSSE } from "../shared/sse";

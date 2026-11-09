@@ -1,10 +1,4 @@
 import {
-  pickBalanced,
-  subjectCounts,
-  topicCounts,
-  lastSelection,
-} from "./variety";
-import {
   chooseBrief,
   isNumberVariant,
   type QuestionBrief,
@@ -20,7 +14,7 @@ import type { PracticeKind } from "../shared/study";
 import { getPrepared, savePrepared } from "./prepared";
 import { z } from "zod";
 import { parseGenerationDraft } from "./generation-draft";
-import { topics, basicTopics } from "./curriculum";
+import { basicTopics } from "./curriculum";
 import { callLLM, parseObject, providerFor, type Usage } from "./llm";
 import { generationExamples } from "./question-examples";
 import { load, loadPlanning, commit, mutate, nextQuestion } from "./repository";

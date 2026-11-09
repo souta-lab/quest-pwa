@@ -4,7 +4,6 @@ import {
   password,
   accountPassword,
   checkPassword,
-  equal,
   seal,
   open,
   validateBase,

@@ -8,12 +8,7 @@ import {
 import { chatStream } from "./chat-stream";
 import { APP_VERSION } from "../shared/release";
 import { mathOptions, errorNames, jstDay } from "../shared/study";
-import {
-  withinStudyScope,
-  studyReport,
-  selectTarget,
-  curriculumFor,
-} from "./study-plan";
+import { withinStudyScope, curriculumFor } from "./study-plan";
 import { foundationLesson } from "./study-lessons";
 import {
   readCourse,
@@ -46,7 +41,6 @@ import {
   mutate,
   bankCount,
   cohortKey,
-  nextQuestion,
   refreshRanking,
 } from "./repository";
 import {
