@@ -18,7 +18,6 @@ import { subjects } from "../worker/catalog";
 import {
   defaultWeight,
   mathOptions,
-  practiceNames,
   errorNames,
   jstDay,
   type StudyGoal,
@@ -65,7 +64,6 @@ export function StudyHome({
   resuming: boolean;
 }) {
   const s = o.study,
-    next = s.recommendation,
     chapter = o.course.next ?? o.course.active;
   return (
     <>

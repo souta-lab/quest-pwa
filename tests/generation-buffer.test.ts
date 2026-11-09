@@ -11,7 +11,6 @@ import {
   fillGenerationBuffer,
   generationStatus,
   nextLiveQuestion,
-  retryPlan,
 } from "../worker/generation";
 
 async function setup(subjects = ["math1", "english", "physics"]) {

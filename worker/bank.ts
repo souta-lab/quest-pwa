@@ -1,4 +1,3 @@
-import { subjects } from "./catalog";
 export { subjects } from "./catalog";
 import generated from "./generated-bank.json";
 export type Question = {

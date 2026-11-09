@@ -1,9 +1,3 @@
-import {
-  pickBalanced,
-  subjectCounts,
-  topicCounts,
-  lastSelection,
-} from "./variety";
 import { reviewSlot } from "./review-mix";
 import {
   studyReport,

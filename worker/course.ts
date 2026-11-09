@@ -2,7 +2,7 @@ import type { Question } from "./bank";
 import type { Answer, LearningState } from "./engine";
 import { courseLessons } from "./course-content";
 import { checkRecall, recallChecks } from "./course-checks";
-import { curriculumFor, unitKey } from "./study-plan";
+import { curriculumFor } from "./study-plan";
 import {
   COURSE_CONTENT_VERSION,
   courseKey,

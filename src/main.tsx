@@ -2409,43 +2409,6 @@ function HintLesson({ text, stage }: { text: string; stage: number }) {
     </>
   );
 }
-function Progress({ value, tone = "green" }: { value: number; tone?: string }) {
-  return (
-    <div className={"progress " + tone}>
-      <span style={{ width: `${Math.min(100, Math.max(0, value))}%` }} />
-    </div>
-  );
-}
-function Metric({
-  icon,
-  label,
-  value,
-  suffix,
-  detail,
-  children,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  suffix?: string;
-  detail: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <section className="metric">
-      <div className="metric-label">
-        {icon}
-        <span>{label}</span>
-      </div>
-      <div className="metric-value">
-        {value}
-        <small>{suffix}</small>
-      </div>
-      {children}
-      <p>{detail}</p>
-    </section>
-  );
-}
 function PageHeading({
   eyebrow,
   title,

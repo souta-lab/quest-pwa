@@ -8,7 +8,6 @@ import {
   Map,
   RotateCcw,
   Target,
-  X,
 } from "lucide-react";
 import type { overview, publicInstance } from "../worker/engine";
 import type { CourseLesson } from "../worker/course-content";
