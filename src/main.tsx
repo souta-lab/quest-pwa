@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ArrowRight,
@@ -31,10 +31,6 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { api, streamApi, ApiError } from "./api";
-import { MathText } from "./MathText";
-import { StudyContent } from "./StudyContent";
-import { Notebook } from "./Notebook";
-import { DesignNotes } from "./DesignNotes";
 import { RewardEffects, type Reward } from "./RewardEffects";
 import { APP_VERSION } from "../shared/release";
 import {
@@ -48,10 +44,7 @@ import {
   type Goal,
   type StudySession,
 } from "./study-session";
-import {
-  GenerationSettings,
-  type GenerationStatus,
-} from "./GenerationSettings";
+import type { GenerationStatus } from "./GenerationSettings";
 import { subjects } from "../worker/catalog";
 import type { overview, publicInstance } from "../worker/engine";
 import "katex/dist/katex.min.css";
@@ -69,16 +62,54 @@ import "./ignition.css";
 import "./rebellion.css";
 import "./course.css";
 import "./family.css";
-import { CoursePage, CourseTrail, RecallGate } from "./CoursePage";
-import {
-  StudyHome,
-  LearningProgress,
-  GoalSettings,
-  FoundationPanel,
-  Reflection,
-} from "./StudyDashboard";
 import { useStudyClock } from "./useStudyClock";
 import { practiceNames } from "../shared/study";
+// Page-level modules are split out of the entry chunk and loaded on first
+// render (every use site is inside the <main> Suspense boundary below).
+// MathText/StudyContent pull in KaTeX, so they are lazy here too;
+// src/MathText.tsx itself stays synchronous because tests render it
+// directly via renderToStaticMarkup.
+const MathText = lazy(() =>
+  import("./MathText").then((m) => ({ default: m.MathText })),
+);
+const StudyContent = lazy(() =>
+  import("./StudyContent").then((m) => ({ default: m.StudyContent })),
+);
+const Notebook = lazy(() =>
+  import("./Notebook").then((m) => ({ default: m.Notebook })),
+);
+const DesignNotes = lazy(() =>
+  import("./DesignNotes").then((m) => ({ default: m.DesignNotes })),
+);
+const GenerationSettings = lazy(() =>
+  import("./GenerationSettings").then((m) => ({
+    default: m.GenerationSettings,
+  })),
+);
+const CoursePage = lazy(() =>
+  import("./CoursePage").then((m) => ({ default: m.CoursePage })),
+);
+const CourseTrail = lazy(() =>
+  import("./CoursePage").then((m) => ({ default: m.CourseTrail })),
+);
+const RecallGate = lazy(() =>
+  import("./CoursePage").then((m) => ({ default: m.RecallGate })),
+);
+const StudyHome = lazy(() =>
+  import("./StudyDashboard").then((m) => ({ default: m.StudyHome })),
+);
+const LearningProgress = lazy(() =>
+  import("./StudyDashboard").then((m) => ({ default: m.LearningProgress })),
+);
+const GoalSettings = lazy(() =>
+  import("./StudyDashboard").then((m) => ({ default: m.GoalSettings })),
+);
+const FoundationPanel = lazy(() =>
+  import("./StudyDashboard").then((m) => ({ default: m.FoundationPanel })),
+);
+const Reflection = lazy(() =>
+  import("./StudyDashboard").then((m) => ({ default: m.Reflection })),
+);
 type Overview = ReturnType<typeof overview>;
 type Instance = NonNullable<ReturnType<typeof publicInstance>>;
 type Me = {
@@ -1276,6 +1307,7 @@ function App() {
           </div>
         </header>
         <main className={"content " + (page === "quiz" ? "quiz-content" : "")}>
+          <Suspense fallback={<p className="muted">読み込んでいます…</p>}>
           {!online && (
             <div className="connection-banner" role="alert">
               通信が切れています。接続が戻ったら同じ操作を再送できます。
@@ -2155,6 +2187,7 @@ function App() {
               </section>
             </>
           )}
+          </Suspense>
         </main>
         <footer className="app-footer">
           <span>QUEST / その評価、覆せ。</span>

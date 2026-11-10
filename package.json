@@ -22,10 +22,10 @@
     "@fontsource/noto-sans-jp": "^5.3.0",
     "@fontsource/outfit": "^5.3.0",
     "katex": "^0.19.0",
-    "lucide-react": "^1.52.0",
+    "lucide-react": "^1.70.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "ts-fsrs": "^5.4.2",
+    "ts-fsrs": "^6.0.0",
     "zod": "^4.6.5"
   },
   "devDependencies": {
@@ -44,6 +44,6 @@
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.2",
-    "wrangler": "^4.147.0"
+    "wrangler": "^4.159.0"
   }
 }
