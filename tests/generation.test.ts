@@ -575,11 +575,24 @@ test("reported generated question loses rating observations but keeps earned XP"
 });
 test("an interrupted job becomes visible as failed without new billed attempts", async () => {
   const f = await setup();
-  const now = Date.now();
+  // Pinned to 12:00 JST so the +6min jump can never cross the JST day boundary.
+  const now = Date.UTC(2026, 10, 12, 3, 0, 0);
   await ensurePlan(f.env, f.id, crypto.randomUUID(), now);
   const status = await generationStatus(f.env, f.id, now + 6 * 60000);
   assert.equal(status.plan!.state, "failed");
   assert.equal(status.used, 1);
+  assert.equal(f.sent.length, 1);
+  f.sqlite.close();
+});
+test("an interrupted job near midnight still fails visibly, with usage counted on the day it ran", async () => {
+  const f = await setup();
+  // 23:57 JST: the +6min status check lands on the next JST day.
+  const now = Date.UTC(2026, 10, 12, 14, 57, 0);
+  await ensurePlan(f.env, f.id, crypto.randomUUID(), now);
+  const status = await generationStatus(f.env, f.id, now + 6 * 60000);
+  assert.equal(status.plan!.state, "failed");
+  // The billed attempt belongs to the previous JST day, so the new day starts at 0.
+  assert.equal(status.used, 0);
   assert.equal(f.sent.length, 1);
   f.sqlite.close();
 });
