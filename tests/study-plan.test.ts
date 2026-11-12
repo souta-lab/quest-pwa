@@ -10,8 +10,10 @@ import {
 } from "../worker/study-plan";
 import { foundationLesson } from "../worker/study-lessons";
 import { bank } from "../worker/bank";
-import { schedule } from "../worker/engine";
 import { mathOptions } from "../shared/study";
+import { getScheduler, schedule } from "../worker/cards";
+
+const scheduler = await getScheduler();
 
 const now = Date.UTC(2026, 9, 17),
   day = 86400000;
@@ -95,8 +97,8 @@ test("secure requires distinct new problems, a delayed retrieval and transfer; o
       first: false,
       dueReview: true,
       previousCard: {
-        ...schedule(null, now - day, false),
-        last_review: new Date(now - day),
+        ...schedule(scheduler, null, "q4", now - day, false),
+        lastReviewAt: new Date(now - day),
       },
     }),
   ];
@@ -107,7 +109,10 @@ test("secure requires distinct new problems, a delayed retrieval and transfer; o
       now + 1001,
     ).units.find((u) => u.topic === "数と式")!;
   assert.equal(unit().stage, "secure");
-  s.cards.q4 = { ...schedule(null, now - day, false), due: new Date(now - 1) };
+  s.cards.q4 = {
+    ...schedule(scheduler, null, "q4", now - day, false),
+    dueAt: new Date(now - 1),
+  };
   assert.notEqual(unit().stage, "secure");
   assert.equal(unit().due, 1);
 });

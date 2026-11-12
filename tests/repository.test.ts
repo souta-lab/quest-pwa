@@ -12,6 +12,10 @@ import {
   publicInstance,
 } from "../worker/engine";
 import { load, commit, mutate, cohortKey } from "../worker/repository";
+import { getScheduler, schedule } from "../worker/cards";
+import { legacySchedule } from "./legacy-fsrs";
+
+const scheduler = await getScheduler();
 const at = Date.UTC(2026, 9, 5);
 test("legacy JSON migration preserves rewards, FSRS, answers and handwriting", async () => {
   const f = fixture(false),
@@ -22,20 +26,32 @@ test("legacy JSON migration preserves rewards, FSRS, answers and handwriting", a
   s.instance!.note = "legacy strokes";
   answer(
     s,
+    scheduler,
     s.instance!.id,
     bank.find((q) => q.id === s.instance!.questionId)!.correct,
     at,
     () => 0,
   );
+  // Pre-0002 data predates the DefaultScheduler migration: its cards carry the
+  // legacy ts-fsrs shape, which the 0002 SQL and the load boundary must read.
+  const [questionId] = Object.keys(s.cards);
+  const legacy = {
+    ...s,
+    cards: { [questionId]: legacySchedule(null, at, false) },
+  };
   f.sqlite
     .prepare("INSERT INTO learning_states VALUES(?,7,?)")
-    .run(id, JSON.stringify(s));
+    .run(id, JSON.stringify(legacy));
   f.migrations();
   const migrated = await load(f.env, id);
   assert.equal(migrated.revision, 8);
   assert.deepEqual(
     JSON.parse(JSON.stringify(migrated.state)),
     JSON.parse(JSON.stringify(s)),
+  );
+  assert.equal(
+    f.sqlite.prepare("SELECT due FROM review_cards").get()!.due,
+    +s.cards[questionId].dueAt,
   );
   const profile = JSON.parse(
     (
@@ -63,6 +79,7 @@ test("losing CAS cannot duplicate answers, rewards, drops or FSRS updates", asyn
   for (const snap of [a, b])
     answer(
       snap.state,
+      scheduler,
       snap.state.instance!.id,
       bank.find((q) => q.id === snap.state.instance!.questionId)!.correct,
       at,
@@ -75,7 +92,7 @@ test("losing CAS cannot duplicate answers, rewards, drops or FSRS updates", asyn
   assert.equal(saved.inventory, 1);
   assert.equal(saved.xp, a.state.xp);
   const retry = await mutate(f.env, id, (s) =>
-    answer(s, s.instance!.id, s.answers[0].option, at, () => 0),
+    answer(s, scheduler, s.instance!.id, s.answers[0].option, at, () => 0),
   );
   assert.equal(retry.xp, saved.answers[0].xp);
   assert.equal((await load(f.env, id)).state.inventory, 1);
@@ -93,7 +110,7 @@ test("a child write failure rolls back the profile and all answer effects", asyn
   f.sqlite.exec(
     "CREATE TRIGGER fail_card BEFORE INSERT ON review_cards BEGIN SELECT RAISE(ABORT,'test failure'); END;",
   );
-  answer(before.state, before.state.instance!.id, null, at, () => 0);
+  answer(before.state, scheduler, before.state.instance!.id, null, at, () => 0);
   await assert.rejects(commit(f.env, id, before), /test failure/);
   const after = await load(f.env, id);
   assert.equal(after.revision, before.revision);
@@ -109,7 +126,7 @@ test("heartbeat and note writes do not read or rewrite answer/card tables", asyn
     s.subjects = ["math1"];
     attachBank(s, bank);
     next(s, at, () => 0);
-    answer(s, s.instance!.id, null, at, () => 0);
+    answer(s, scheduler, s.instance!.id, null, at, () => 0);
   });
   f.queries.length = 0;
   await mutate(
@@ -142,6 +159,7 @@ test("forgot corrections update a single answer and the corresponding card", asy
     next(s, at, () => 0);
     answer(
       s,
+      scheduler,
       s.instance!.id,
       bank.find((q) => q.id === s.instance!.questionId)!.correct,
       at,
@@ -150,7 +168,7 @@ test("forgot corrections update a single answer and the corresponding card", asy
   });
   const old = (await load(f.env, id)).state;
   f.queries.length = 0;
-  await mutate(f.env, id, (s) => forget(s, s.instance!.id));
+  await mutate(f.env, id, (s) => forget(s, scheduler, s.instance!.id));
   assert.equal(
     f.queries.filter((q) => q.startsWith("INSERT INTO answer_events")).length,
     1,
@@ -239,7 +257,6 @@ test("10,000-question fixture selects in D1 without loading the whole bank or hi
 });
 test("D1 selection chooses the oldest due card when review is selected", async () => {
   const { nextQuestion } = await import("../worker/repository");
-  const { schedule } = await import("../worker/engine");
   const f = fixture(),
     id = f.user();
   const qs = bank.filter((q) => q.subject === "math1");
@@ -247,8 +264,8 @@ test("D1 selection chooses the oldest due card when review is selected", async (
     s.subjects = ["math1"];
     qs.forEach((q, n) => {
       s.cards[q.id] = {
-        ...schedule(null, at, true),
-        due: new Date(at + n * 1000),
+        ...schedule(scheduler, null, q.id, at, true),
+        dueAt: new Date(at + n * 1000),
       };
     });
   });
@@ -260,7 +277,6 @@ test("D1 selection chooses the oldest due card when review is selected", async (
 });
 test("D1 selection picks the remaining unseen question before early extra practice", async () => {
   const { nextQuestion } = await import("../worker/repository");
-  const { schedule } = await import("../worker/engine");
   const f = fixture(),
     id = f.user();
   const qs = bank.filter((q) => q.subject === "math1");
@@ -268,8 +284,8 @@ test("D1 selection picks the remaining unseen question before early extra practi
     s.subjects = ["math1"];
     qs.slice(1).forEach((q) => {
       s.cards[q.id] = {
-        ...schedule(null, at, true),
-        due: new Date(at + 86400000),
+        ...schedule(scheduler, null, q.id, at, true),
+        dueAt: new Date(at + 86400000),
       };
     });
   });
@@ -304,7 +320,7 @@ test("recent due cards are held for ten minutes, then become eligible without ch
   });
   const first = (await nextQuestion(f.env, id, false, now, () => 0))!;
   await mutate(f.env, id, (s) => {
-    answer(s, first.id, null, now, () => 1);
+    answer(s, scheduler, first.id, null, now, () => 1);
     s.instance = null;
   });
   f.sqlite
@@ -330,15 +346,14 @@ test("recent due cards are held for ten minutes, then become eligible without ch
 });
 test("exhausted subjects cannot force early repeats while another subject has unseen questions", async () => {
   const { nextQuestion } = await import("../worker/repository");
-  const { schedule } = await import("../worker/engine");
   const f = fixture(),
     id = f.user();
   await mutate(f.env, id, (s) => {
     s.subjects = ["math1", "english"];
     for (const q of bank.filter((q) => q.subject === "math1"))
       s.cards[q.id] = {
-        ...schedule(null, at, false),
-        due: new Date(at + 86400000),
+        ...schedule(scheduler, null, q.id, at, false),
+        dueAt: new Date(at + 86400000),
       };
   });
   assert.equal(

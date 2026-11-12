@@ -9,7 +9,12 @@ import { normalizeStudyGoal } from "../shared/study";
 import { courseKey, COURSE_CONTENT_VERSION } from "../shared/course";
 import { courseForQuestion } from "./course";
 import { getPrepared, savePrepared } from "./prepared";
-import type { Card } from "ts-fsrs";
+import {
+  isLegacy,
+  readStoredCard,
+  toQuestCard,
+  type StoredCard,
+} from "./cards";
 import type { Question } from "./bank";
 import {
   attachBank,
@@ -49,6 +54,19 @@ export function preparationKey(s: LearningState) {
     s.course?.active ? courseKey(s.course.active) : null,
     s.course?.active ? COURSE_CONTENT_VERSION : null,
   ]);
+}
+// Read boundary for answer_events: previousCard snapshots may be in the legacy
+// ts-fsrs shape. `legacy` tells the caller the in-memory JSON differs from storage.
+function readAnswer(raw: string) {
+  const a = JSON.parse(raw) as Omit<Answer, "previousCard"> & {
+    previousCard: StoredCard | null;
+  };
+  const legacy = !!a.previousCard && isLegacy(a.previousCard);
+  const answer: Answer = {
+    ...a,
+    previousCard: a.previousCard && toQuestCard(a.previousCard, a.questionId),
+  };
+  return { answer, legacy };
 }
 function profileData(s: LearningState) {
   const { cards, answers, instance, ...profile } = s;
@@ -117,15 +135,20 @@ export async function load(
       question_id: string;
       data: string;
     }[]) {
-      cards.set(r.question_id, r.data);
-      state.cards[r.question_id] = JSON.parse(r.data) as Card;
+      // Legacy-shape rows are converted on read and recorded in their converted
+      // form, so an unchanged card is not rewritten; it moves to the new shape
+      // the next time it is actually scheduled.
+      const { card, legacy } = readStoredCard(r.data, r.question_id);
+      cards.set(r.question_id, legacy ? JSON.stringify(card) : r.data);
+      state.cards[r.question_id] = card;
     }
     for (const r of rows[3].results as {
       instance_id: string;
       data: string;
     }[]) {
-      answers.set(r.instance_id, r.data);
-      state.answers.push(JSON.parse(r.data) as Answer);
+      const { answer, legacy } = readAnswer(r.data);
+      answers.set(r.instance_id, legacy ? JSON.stringify(answer) : r.data);
+      state.answers.push(answer);
     }
     attachBank(
       state,
@@ -218,7 +241,7 @@ export async function commit(
       statements.push(
         env.DB.prepare(
           `INSERT INTO review_cards(user_id,question_id,due,data) SELECT ?,?,?,? WHERE ${guard} ON CONFLICT(user_id,question_id) DO UPDATE SET due=excluded.due,data=excluded.data`,
-        ).bind(id, questionId, +new Date(card.due), data, ...bindGuard),
+        ).bind(id, questionId, +new Date(card.dueAt), data, ...bindGuard),
       );
     }
     for (const a of s.answers) {
@@ -286,11 +309,11 @@ export async function loadPlanning(env: Env, id: string) {
       `SELECT json_object('id',q.id,'subject',q.subject,'topic',q.topic,'basicRange',q.basic_range,'suspended',q.suspended=1 OR NOT COALESCE((q.owner_user_id IS NULL AND q.sharing_status='approved') OR q.owner_user_id=?,0) OR EXISTS(SELECT 1 FROM question_reports r WHERE r.user_id=? AND r.question_id=q.id)) AS data FROM question_catalog q WHERE EXISTS(SELECT 1 FROM review_cards c WHERE c.user_id=? AND c.question_id=q.id) OR q.id=?`,
     ).bind(id, id, id, s.instance?.questionId ?? ""),
   ]);
-  s.answers = (rows[0].results as Row[]).map((r) => JSON.parse(r.data));
+  s.answers = (rows[0].results as Row[]).map((r) => readAnswer(r.data).answer);
   s.cards = Object.fromEntries(
     (rows[1].results as { question_id: string; data: string }[]).map((r) => [
       r.question_id,
-      JSON.parse(r.data),
+      readStoredCard(r.data, r.question_id).card,
     ]),
   );
   attachBank(

@@ -4,7 +4,7 @@ import { fixture, seedNewAnswers } from "./d1-fixture";
 import { bank } from "../worker/bank";
 import { seal } from "../worker/security";
 import { mutate, load } from "../worker/repository";
-import { answer, schedule } from "../worker/engine";
+import { answer } from "../worker/engine";
 import { chooseBrief } from "../worker/question-variety";
 import {
   configureGeneration,
@@ -15,6 +15,9 @@ import {
   reportGenerated,
   retryPlan,
 } from "../worker/generation";
+import { getScheduler, schedule } from "../worker/cards";
+
+const scheduler = await getScheduler();
 async function setup(limit = 20) {
   const f = fixture(),
     id = f.user(),
@@ -182,8 +185,8 @@ test("a due backlog offers saved retrieval before charging for another question"
   await mutate(f.env, f.id, (s) => {
     for (const q of bank.filter((q) => q.subject === "math1"))
       s.cards[q.id] = {
-        ...schedule(null, now - 86400000, true),
-        due: new Date(now - 86400000),
+        ...schedule(scheduler, null, q.id, now - 86400000, true),
+        dueAt: new Date(now - 86400000),
       };
   });
   await ensurePlan(f.env, f.id, crypto.randomUUID(), now, () => 0);
@@ -391,8 +394,8 @@ test("FSRS review uses the saved generated question without another model call",
         .get(first.questionId)!.data as string,
     ).correct;
     await mutate(f.env, f.id, (s) => {
-      answer(s, first.id, correct, Date.now() - 660000);
-      s.cards[first.questionId].due = new Date(Date.now() - 1000);
+      answer(s, scheduler, first.id, correct, Date.now() - 660000);
+      s.cards[first.questionId].dueAt = new Date(Date.now() - 1000);
       s.instance!.note = "old note";
       s.instance = null;
     });
@@ -553,7 +556,7 @@ test("reported generated question loses rating observations but keeps earned XP"
         .prepare("SELECT data FROM question_catalog WHERE id=?")
         .get(result.questionId)!.data as string,
     ).correct;
-    await mutate(f.env, f.id, (s) => answer(s, result.id, correct));
+    await mutate(f.env, f.id, (s) => answer(s, scheduler, result.id, correct));
     const before = (await load(f.env, f.id)).state;
     await reportGenerated(f.env, f.id, result.questionId, "解説に疑問");
     const after = (await load(f.env, f.id)).state;
@@ -808,8 +811,8 @@ test("operator-approved questions can be shared, while a report only excludes th
     const shared = await nextLiveQuestion(f.env, other);
     if (!shared || "waiting" in shared) throw Error("not ready");
     assert.equal(shared.questionId, first.questionId);
-    await mutate(f.env, f.id, (s) => answer(s, first.id, null));
-    await mutate(f.env, other, (s) => answer(s, shared.id, null));
+    await mutate(f.env, f.id, (s) => answer(s, scheduler, first.id, null));
+    await mutate(f.env, other, (s) => answer(s, scheduler, shared.id, null));
     const xp = (await load(f.env, other)).state.xp;
     await reportGenerated(f.env, other, shared.questionId, "正解が曖昧");
     await reportGenerated(f.env, other, shared.questionId, "duplicate");

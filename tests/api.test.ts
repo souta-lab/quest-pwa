@@ -8,6 +8,9 @@ import { next, answer, attachBank } from "../worker/engine";
 import { renderQuestionHint } from "../worker/question-hints";
 import { bank } from "../worker/bank";
 import { readSSE } from "../shared/sse";
+import { getScheduler } from "../worker/cards";
+
+const scheduler = await getScheduler();
 function draft(stem: string) {
   const anchor = stem.slice(0, 12);
   return {
@@ -159,6 +162,7 @@ test("late AI result cannot retroactively change a completed answer", async () =
     await mutate(f.env, f.id, (s) =>
       answer(
         s,
+        scheduler,
         f.instanceId,
         bank.find((q) => q.id === s.instance!.questionId)!.correct,
       ),
@@ -261,7 +265,9 @@ test("answer requests and malicious AI output cannot escape the validated hint b
   try {
     for (const answered of [false, true]) {
       if (answered)
-        await mutate(f.env, f.id, (s) => answer(s, f.instanceId, null));
+        await mutate(f.env, f.id, (s) =>
+          answer(s, scheduler, f.instanceId, null),
+        );
       for (const content of [
         "正解はAです。",
         '{"hintId":1,"answer":"A"}',
@@ -685,7 +691,9 @@ test(
       });
       const events = readSSE(r.body!);
       await events.next();
-      await mutate(f.env, f.id, (s) => answer(s, f.instanceId, null));
+      await mutate(f.env, f.id, (s) =>
+        answer(s, scheduler, f.instanceId, null),
+      );
       release();
       const received = [];
       for await (const e of events) received.push(e);
@@ -767,3 +775,29 @@ test(
     }
   },
 );
+test("answer and forget routes schedule with DefaultScheduler and keep the public due field", async () => {
+  const f = await setup();
+  const { state } = await load(f.env, f.id);
+  const q = bank.find((q) => q.id === state.instance!.questionId)!;
+  const r = await f.call("/answer", {
+    instanceId: f.instanceId,
+    option: q.correct,
+  });
+  assert.equal(r.status, 200);
+  const { result } = (await r.json()) as { result: { due: string } };
+  const row = () =>
+    f.sqlite
+      .prepare(
+        "SELECT due,data FROM review_cards WHERE user_id=? AND question_id=?",
+      )
+      .get(f.id, q.id) as { due: number; data: string };
+  assert.equal(Date.parse(result.due), row().due);
+  assert.equal(Date.parse(JSON.parse(row().data).dueAt), row().due);
+  assert.equal(JSON.parse(row().data).cardId, q.id);
+  const before = row().due;
+  const forgot = await f.call("/forget", { instanceId: f.instanceId });
+  assert.equal(forgot.status, 200);
+  assert.equal((await load(f.env, f.id)).state.answers[0].forgot, true);
+  assert.ok(row().due < before, "Again schedules sooner than Good");
+  f.sqlite.close();
+});

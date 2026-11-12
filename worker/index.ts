@@ -52,6 +52,7 @@ import {
   questionsFor,
   rankNames,
 } from "./engine";
+import { getScheduler } from "./cards";
 import {
   type Env,
   HttpError,
@@ -814,11 +815,13 @@ async function api(req: Request, env: Env, ctx?: ExecutionContext) {
         activeMs: z.number().int().min(0).max(1800000).optional(),
       }),
     );
+    // Initialize before mutate: a scheduler failure aborts with nothing written.
+    const scheduler = await getScheduler();
     return json(
       await mutate(env, user.id, (s) => {
         if (s.instance?.id === b.instanceId && !s.instance.responseMode)
           s.instance.responseMode = "recognition";
-        const result = answer(s, b.instanceId, b.option);
+        const result = answer(s, scheduler, b.instanceId, b.option);
         const event = s.answers.find((a) => a.instanceId === b.instanceId)!;
         if (event.activeMs === undefined && b.activeMs !== undefined)
           event.activeMs = Math.min(
@@ -835,9 +838,10 @@ async function api(req: Request, env: Env, ctx?: ExecutionContext) {
   }
   if (path === "/api/forget" && req.method === "POST") {
     const b = await body(req, z.object({ instanceId: z.string().uuid() }));
+    const scheduler = await getScheduler();
     return json(
       await mutate(env, user.id, (s) => {
-        forget(s, b.instanceId);
+        forget(s, scheduler, b.instanceId);
         return { instance: publicInstance(s), overview: overview(s) };
       }),
     );

@@ -1,4 +1,5 @@
 import type { Answer, LearningState } from "./engine";
+import { lastReviewAt } from "./cards";
 import type { Question } from "./bank";
 import { subjects } from "./catalog";
 import { topics, basicTopics } from "./curriculum";
@@ -199,7 +200,7 @@ export function studyReport(
       !q ||
       q.suspended ||
       !withinStudyScope(s, q) ||
-      +new Date(card.due) > now
+      +new Date(card.dueAt) > now
     )
       continue;
     const key = unitKey(q.subject, q.topic);
@@ -225,8 +226,7 @@ export function studyReport(
       (a) =>
         a.dueReview &&
         clean(a) &&
-        a.previousCard?.last_review &&
-        a.at - +new Date(a.previousCard.last_review) >= DAY,
+        a.at - (lastReviewAt(a.previousCard) ?? Infinity) >= DAY,
     ).length;
     const transfer = successful.filter(
       (a) =>

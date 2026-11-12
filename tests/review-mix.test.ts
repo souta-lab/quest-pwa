@@ -2,10 +2,13 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { fixture, seedNewAnswers } from "./d1-fixture";
 import { bank } from "../worker/bank";
-import { answer, schedule } from "../worker/engine";
+import { answer } from "../worker/engine";
 import { load, mutate, nextQuestion } from "../worker/repository";
 import { reviewSlot } from "../worker/review-mix";
 import { getPrepared, promotePrepared } from "../worker/prepared";
+import { getScheduler, schedule } from "../worker/cards";
+
+const scheduler = await getScheduler();
 
 test("a large due backlog alternates retrieval and new learning in 30 answers", async () => {
   const f = fixture(),
@@ -23,8 +26,8 @@ test("a large due backlog alternates retrieval and new learning in 30 answers", 
     s.subjects = ["math1"];
     for (let n = 0; n < 80; n++)
       s.cards["mix-" + n] = {
-        ...schedule(null, now - 86400000, true),
-        due: new Date(now - 86400000),
+        ...schedule(scheduler, null, "mix-" + n, now - 86400000, true),
+        dueAt: new Date(now - 86400000),
       };
   });
   let reviews = 0;
@@ -33,7 +36,14 @@ test("a large due backlog alternates retrieval and new learning in 30 answers", 
     assert.equal(q.dueReview, n % 2 === 0, "answer " + (n + 1));
     reviews += Number(q.dueReview);
     await mutate(f.env, id, (s) => {
-      answer(s, q.id, q.question.options[0].id, now + n * 600001, () => 1);
+      answer(
+        s,
+        scheduler,
+        q.id,
+        q.question.options[0].id,
+        now + n * 600001,
+        () => 1,
+      );
     });
   }
   assert.equal(reviews, 15);
@@ -58,8 +68,8 @@ test("prefetch includes the current new problem in the two-new retrieval cadence
       (q) => q.subject === "math1" && q.id !== current.questionId,
     )!;
     s.cards[other.id] = {
-      ...schedule(null, now - 86400000, true),
-      due: new Date(now - 86400000),
+      ...schedule(scheduler, null, other.id, now - 86400000, true),
+      dueAt: new Date(now - 86400000),
     };
   });
   assert.equal(await reviewSlot(f.env, id), false);
@@ -72,13 +82,13 @@ test("prefetch includes the current new problem in the two-new retrieval cadence
     1,
   );
   await mutate(f.env, id, (s) => {
-    answer(s, current.id, null, now, () => 1);
+    answer(s, scheduler, current.id, null, now, () => 1);
   });
   const snapshot = await load(f.env, id, "current");
   assert.equal(await reviewSlot(f.env, id, snapshot.state.instance), true);
   await promotePrepared(f.env, id, prepared.id, current.id);
   await mutate(f.env, id, (s) => {
-    answer(s, prepared.id, null, now + 1, () => 1);
+    answer(s, scheduler, prepared.id, null, now + 1, () => 1);
   });
   assert.equal(await reviewSlot(f.env, id), false);
   f.sqlite.close();
@@ -92,14 +102,14 @@ test("an exhausted new pool can use only genuinely due retrieval cards", async (
     s.subjects = ["math1"];
     for (const q of bank.filter((q) => q.subject === "math1"))
       s.cards[q.id] = {
-        ...schedule(null, now - 86400000, true),
-        due: new Date(now - 86400000),
+        ...schedule(scheduler, null, q.id, now - 86400000, true),
+        dueAt: new Date(now - 86400000),
       };
   });
   const q = (await nextQuestion(f.env, id, false, now, () => 0))!;
   assert.equal(q.dueReview, true);
   assert.ok(
-    +new Date((await load(f.env, id)).state.cards[q.questionId].due) <= now,
+    +new Date((await load(f.env, id)).state.cards[q.questionId].dueAt) <= now,
   );
   f.sqlite.close();
 });
@@ -118,8 +128,8 @@ test("an old prepared review is discarded if its mix slot is no longer available
       (q) => q.subject === "math1" && q.id !== current.questionId,
     )!;
     s.cards[other.id] = {
-      ...schedule(null, now - 86400000, true),
-      due: new Date(now - 86400000),
+      ...schedule(scheduler, null, other.id, now - 86400000, true),
+      dueAt: new Date(now - 86400000),
     };
   });
   assert.equal(

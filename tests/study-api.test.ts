@@ -4,11 +4,14 @@ import worker from "../worker/index";
 import { fixture } from "./d1-fixture";
 import { hash } from "../worker/security";
 import { mutate, nextQuestion, load, loadPlanning } from "../worker/repository";
-import { overview, schedule } from "../worker/engine";
+import { overview } from "../worker/engine";
 import { defaultStudyGoal, mathOptions } from "../shared/study";
 import { bank } from "../worker/bank";
 import { courseKey } from "../shared/course";
 import { courseLessons } from "../worker/course-content";
+import { getScheduler, schedule } from "../worker/cards";
+
+const scheduler = await getScheduler();
 
 async function setup() {
   const f = fixture(),
@@ -54,8 +57,8 @@ test("quarantined foreign legacy cards do not inflate a learner's due backlog or
       .run(q.id, q.subject, q.topic, JSON.stringify(q), other);
     await mutate(f.env, f.id, (s) => {
       s.cards[q.id] = {
-        ...schedule(null, Date.now() - 86400000, true),
-        due: new Date(0),
+        ...schedule(scheduler, null, q.id, Date.now() - 86400000, true),
+        dueAt: new Date(0),
       };
     });
     f.sqlite
@@ -65,8 +68,14 @@ test("quarantined foreign legacy cards do not inflate a learner's due backlog or
       .run(JSON.stringify({ ...q, id: "orphan-pending" }));
     await mutate(f.env, f.id, (s) => {
       s.cards["orphan-pending"] = {
-        ...schedule(null, Date.now() - 86400000, true),
-        due: new Date(0),
+        ...schedule(
+          scheduler,
+          null,
+          "orphan-pending",
+          Date.now() - 86400000,
+          true,
+        ),
+        dueAt: new Date(0),
       };
     });
     for (const s of [

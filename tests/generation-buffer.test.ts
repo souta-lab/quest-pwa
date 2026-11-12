@@ -4,7 +4,7 @@ import worker from "../worker/index";
 import { fixture, seedNewAnswers } from "./d1-fixture";
 import { seal } from "../worker/security";
 import { mutate, load } from "../worker/repository";
-import { schedule, answer } from "../worker/engine";
+import { answer } from "../worker/engine";
 import { bank } from "../worker/bank";
 import {
   configureGeneration,
@@ -12,6 +12,9 @@ import {
   generationStatus,
   nextLiveQuestion,
 } from "../worker/generation";
+import { getScheduler, schedule } from "../worker/cards";
+
+const scheduler = await getScheduler();
 
 async function setup(subjects = ["math1", "english", "physics"]) {
   const f = fixture(),
@@ -206,7 +209,10 @@ test("future review positions include queued new questions without changing FSRS
     seedNewAnswers(f, f.id, 9, Date.now() - 100000);
     await mutate(f.env, f.id, (s) => {
       const q = bank.find((q) => q.subject === "math1")!;
-      s.cards[q.id] = { ...schedule(null, due, true), due: new Date(due) };
+      s.cards[q.id] = {
+        ...schedule(scheduler, null, q.id, due, true),
+        dueAt: new Date(due),
+      };
     });
     await fillGenerationBuffer(f.env, f.id);
     await f.drain();
@@ -234,8 +240,8 @@ test("consuming a five-question buffer preserves interleaving and never repeats 
     await mutate(f.env, f.id, (s) => {
       for (const q of bank.filter((q) => q.subject === "math1"))
         s.cards[q.id] = {
-          ...schedule(null, now - 86400000, true),
-          due: new Date(now - 86400000),
+          ...schedule(scheduler, null, q.id, now - 86400000, true),
+          dueAt: new Date(now - 86400000),
         };
     });
     let lastReview = -10,
@@ -257,7 +263,9 @@ test("consuming a five-question buffer preserves interleaving and never repeats 
           .prepare("SELECT data FROM question_catalog WHERE id=?")
           .get(current.questionId)!.data as string,
       );
-      await mutate(f.env, f.id, (s) => answer(s, current.id, q.correct));
+      await mutate(f.env, f.id, (s) =>
+        answer(s, scheduler, current.id, q.correct),
+      );
       await fillGenerationBuffer(f.env, f.id);
       await f.drain();
     }

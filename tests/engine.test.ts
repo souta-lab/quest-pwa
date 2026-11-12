@@ -11,6 +11,9 @@ import {
   overview,
   eligible,
 } from "../worker/engine";
+import { getScheduler } from "../worker/cards";
+
+const scheduler = await getScheduler();
 const t = Date.UTC(2026, 9, 5);
 function state() {
   const s = initialState(bank);
@@ -38,8 +41,8 @@ test("retries award XP and drops only once", () => {
   const s = state(),
     i = next(s, t)!;
   const q = bank.find((q) => q.id === i.questionId)!;
-  const r = answer(s, i.id, q.correct, t, () => 0);
-  const twice = answer(s, i.id, q.correct, t, () => 0);
+  const r = answer(s, scheduler, i.id, q.correct, t, () => 0);
+  const twice = answer(s, scheduler, i.id, q.correct, t, () => 0);
   assert.equal(r.id, twice.id);
   assert.equal(s.answers.length, 1);
   assert.equal(s.inventory, 1);
@@ -49,24 +52,31 @@ test("forgotten correct answer changes schedule but retains XP and combo", () =>
   const s = state(),
     i = next(s, t)!;
   const q = bank.find((q) => q.id === i.questionId)!;
-  answer(s, i.id, q.correct, t, () => 1);
+  answer(s, scheduler, i.id, q.correct, t, () => 1);
   const xp = s.xp,
     combo = s.combo;
-  forget(s, i.id);
+  forget(s, scheduler, i.id);
   assert.equal(s.xp, xp);
   assert.equal(s.combo, combo);
   assert.equal(s.cards[q.id].lapses, 0);
   assert.equal(s.answers[0].forgot, true);
-  assert.ok(+new Date(s.cards[q.id].due) < t + 86400000);
+  assert.ok(+new Date(s.cards[q.id].dueAt) < t + 86400000);
 });
 test("unknown is Again, preserves previously awarded rewards, breaks combo", () => {
   const s = state();
   let i = next(s, t)!;
-  answer(s, i.id, bank.find((q) => q.id === i.questionId)!.correct, t, () => 1);
+  answer(
+    s,
+    scheduler,
+    i.id,
+    bank.find((q) => q.id === i.questionId)!.correct,
+    t,
+    () => 1,
+  );
   const xp = s.xp;
   s.instance = null;
   i = next(s, t + 100)!;
-  answer(s, i.id, null, t + 100, () => 1);
+  answer(s, scheduler, i.id, null, t + 100, () => 1);
   assert.equal(s.combo, 0);
   assert.ok(s.xp >= xp);
   assert.equal(s.answers[1].option, null);
@@ -78,8 +88,8 @@ test("hint-free bonus goes to learning, not XP", () => {
   b.instance = structuredClone(a.instance);
   b.instance!.hint = true;
   const correct = bank.find((q) => q.id === i.questionId)!.correct;
-  answer(a, i.id, correct, t, () => 1);
-  answer(b, i.id, correct, t, () => 1);
+  answer(a, scheduler, i.id, correct, t, () => 1);
+  answer(b, scheduler, i.id, correct, t, () => 1);
   assert.equal(a.xp, b.xp);
   assert.ok(a.answers[0].learning > b.answers[0].learning);
   assert.equal(overview(b, t).bySubject[0].observations, 0);
@@ -101,7 +111,7 @@ test("matching accumulated results do not reward number of calendar days", () =>
   for (let i = 0; i < 4; i++) {
     a.instance = null;
     const inst = next(a, t + i * 1000)!;
-    answer(a, inst.id, null, t + i * 1000, () => 1);
+    answer(a, scheduler, inst.id, null, t + i * 1000, () => 1);
   }
   const b = attachBank(structuredClone(a), bank);
   b.answers.forEach((x, i) => (x.at = t - i * 86400000));

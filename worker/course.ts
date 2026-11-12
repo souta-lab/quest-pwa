@@ -1,5 +1,6 @@
 import type { Question } from "./bank";
 import type { Answer, LearningState } from "./engine";
+import { lastReviewAt } from "./cards";
 import { courseLessons } from "./course-content";
 import { checkRecall, recallChecks } from "./course-checks";
 import { curriculumFor } from "./study-plan";
@@ -178,8 +179,7 @@ export function courseReport(
         (a) =>
           a.dueReview &&
           independent(a) &&
-          a.previousCard?.last_review &&
-          a.at - +new Date(a.previousCard.last_review) >= DAY &&
+          a.at - (lastReviewAt(a.previousCard) ?? Infinity) >= DAY &&
           a.at - lastExposure(s, key, r, a.at, allHistory) >= DAY,
       );
       const delayed = !!r.delayedAt || delayedAnswer;

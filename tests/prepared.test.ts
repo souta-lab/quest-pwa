@@ -6,6 +6,9 @@ import { promotePrepared } from "../worker/prepared";
 import { answer } from "../worker/engine";
 import { bank } from "../worker/bank";
 import { pickBalanced } from "../worker/variety";
+import { getScheduler } from "../worker/cards";
+
+const scheduler = await getScheduler();
 
 test("preparing is safe, reusable, and does not advance or start the next answer clock", async () => {
   const f = fixture(),
@@ -39,6 +42,7 @@ test("preparing is safe, reusable, and does not advance or start the next answer
   await mutate(f.env, id, (s) =>
     answer(
       s,
+      scheduler,
       current.id,
       bank.find((q) => q.id === current.questionId)!.correct,
     ),
@@ -71,7 +75,7 @@ test("subject changes and quarantine invalidate a prepared question", async () =
     true,
   ))!;
   await mutate(f.env, id, (s) => {
-    answer(s, current.id, null);
+    answer(s, scheduler, current.id, null);
     s.subjects = ["english"];
   });
   await assert.rejects(
@@ -121,7 +125,7 @@ test("a legacy prepared repeat cannot be promoted and is replaced by an unseen q
     Math.random,
     true,
   ))!;
-  await mutate(f.env, id, (s) => answer(s, current.id, null));
+  await mutate(f.env, id, (s) => answer(s, scheduler, current.id, null));
   f.sqlite
     .prepare("UPDATE prepared_instances SET question_id=? WHERE user_id=?")
     .run(current.questionId, id);

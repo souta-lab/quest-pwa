@@ -1,4 +1,4 @@
-import { createEmptyCard, fsrs, Rating, type Card } from "ts-fsrs";
+import { schedule, type QuestCard, type Scheduler } from "./cards";
 import type { Question } from "./bank";
 import { subjects } from "./catalog";
 import {
@@ -54,7 +54,7 @@ export type Answer = {
   xp: number;
   learning: number;
   difficulty: number;
-  previousCard: Card | null;
+  previousCard: QuestCard | null;
   drop: boolean;
   excluded?: boolean;
   topic?: string;
@@ -87,7 +87,7 @@ export type LearningState = {
   xp: number;
   combo: number;
   bestCombo: number;
-  cards: Record<string, Card>;
+  cards: Record<string, QuestCard>;
   answers: Answer[];
   instance: Instance | null;
   inventory: number;
@@ -130,20 +130,6 @@ export function initialState(questions: Question[] = []): LearningState {
     questions,
   );
 }
-export function hydrateCard(card: Card): Card {
-  return {
-    ...card,
-    due: new Date(card.due),
-    last_review: card.last_review ? new Date(card.last_review) : undefined,
-  };
-}
-const scheduler = fsrs({ request_retention: 0.9, enable_fuzz: false });
-export function schedule(card: Card | null, at: number, again: boolean) {
-  return scheduler.repeat(
-    card ? hydrateCard(card) : createEmptyCard(new Date(at)),
-    new Date(at),
-  )[again ? Rating.Again : Rating.Good].card;
-}
 export function shuffle<T>(xs: T[], random = Math.random) {
   const copy = [...xs];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -164,14 +150,14 @@ export function next(s: LearningState, now = Date.now(), random = Math.random) {
   const pool = qs.filter((q) => q.subject === subject);
   const unseen = pool.filter((q) => !s.cards[q.id]);
   const due = pool.filter(
-    (q) => s.cards[q.id] && +new Date(s.cards[q.id].due) <= now,
+    (q) => s.cards[q.id] && +new Date(s.cards[q.id].dueAt) <= now,
   );
   const ratio = Math.min(0.75, 0.25 + due.length * 0.025);
   let pick: Question;
   let review = false;
   if (due.length && (!unseen.length || random() < ratio)) {
     pick = due.sort(
-      (a, b) => +new Date(s.cards[a.id].due) - +new Date(s.cards[b.id].due),
+      (a, b) => +new Date(s.cards[a.id].dueAt) - +new Date(s.cards[b.id].dueAt),
     )[0];
     review = true;
   } else if (unseen.length) pick = unseen[Math.floor(random() * unseen.length)];
@@ -229,11 +215,13 @@ function answerResult(s: LearningState, a: Answer) {
     correctOption: q.correct,
     explanation: q.explanation,
     combo: s.combo,
-    due: s.cards[q.id].due,
+    // Public API contract keeps the `due` name.
+    due: s.cards[q.id].dueAt,
   };
 }
 export function answer(
   s: LearningState,
+  scheduler: Scheduler,
   instanceId: string,
   option: string | null,
   now = Date.now(),
@@ -295,7 +283,13 @@ export function answer(
     courseVersion: q.generation?.teachingVersion,
   };
   s.answers.push(a);
-  s.cards[q.id] = schedule(previousCard, now, !correct || i.hint);
+  s.cards[q.id] = schedule(
+    scheduler,
+    previousCard,
+    q.id,
+    now,
+    !correct || i.hint,
+  );
   s.xp += xp;
   if (drop) s.inventory++;
   awardTitles(s);
@@ -303,7 +297,13 @@ export function answer(
   s.highestRank = Math.max(s.highestRank, current.rankIndex);
   return answerResult(s, a);
 }
-export function forget(s: LearningState, instanceId: string) {
+// App-level "I didn't actually remember" correction (not the library's forget):
+// replay this question's answers from the pre-answer snapshot.
+export function forget(
+  s: LearningState,
+  scheduler: Scheduler,
+  instanceId: string,
+) {
   const target = s.answers.find((a) => a.instanceId === instanceId);
   if (!target || !target.correct)
     throw Error("正解した回答を指定してください。");
@@ -314,7 +314,13 @@ export function forget(s: LearningState, instanceId: string) {
     .filter((a) => a.questionId === target.questionId);
   let card = target.previousCard;
   for (const a of subsequent)
-    card = schedule(card, a.at, !a.correct || a.hint || a.forgot);
+    card = schedule(
+      scheduler,
+      card,
+      target.questionId,
+      a.at,
+      !a.correct || a.hint || a.forgot,
+    );
   s.cards[target.questionId] = card!;
 }
 export function heartbeat(
@@ -385,7 +391,7 @@ export function overview(s: LearningState, now = Date.now()) {
         (q) =>
           q.subject === id &&
           s.cards[q.id] &&
-          +new Date(s.cards[q.id].due) <= now,
+          +new Date(s.cards[q.id].dueAt) <= now,
       ).length,
     };
   });

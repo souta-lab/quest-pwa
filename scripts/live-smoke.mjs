@@ -11,7 +11,7 @@ import { resolve, extname } from "node:path";
 import assert from "node:assert/strict";
 import { chromium as playwright } from "playwright";
 import chromium from "@sparticuz/chromium";
-import { schedule } from "../worker/engine.ts";
+import { getScheduler, schedule } from "../worker/cards.ts";
 const origin = "http://localhost:8790",
   calls = [];
 let serial = 0,
@@ -340,7 +340,11 @@ try {
     verificationModel: "verify-model",
   });
   const due = Date.now() + 86400000;
-  const card = { ...schedule(null, Date.now(), true), due: new Date(due) };
+  const scheduler = await getScheduler();
+  const card = (id) => ({
+    ...schedule(scheduler, null, id, Date.now(), true),
+    dueAt: new Date(due),
+  });
   const starterQuestions = await db
     .prepare("SELECT id FROM question_catalog WHERE subject='math1'")
     .all();
@@ -350,7 +354,7 @@ try {
         .prepare(
           "INSERT OR REPLACE INTO review_cards(user_id,question_id,due,data) VALUES(?,?,?,?)",
         )
-        .bind(userId, id, due, JSON.stringify(card)),
+        .bind(userId, id, due, JSON.stringify(card(id))),
     ),
   );
   await page.reload();
