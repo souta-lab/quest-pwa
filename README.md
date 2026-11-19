@@ -9,7 +9,7 @@
 学習履歴から「次に解くべき一問」を選ぶ、共通テスト特化の学習PWA。
 **基礎の理解 → 初見問題を自力で解く → 応用 → FSRSの期日復習** を一つの流れにつなぐ。
 
-![version](https://img.shields.io/badge/version-v0.5.2_%22REBELLION%22-b91c1c)
+![version](https://img.shields.io/badge/version-v0.6.0_%22REBELLION%22-b91c1c)
 [![Live](https://img.shields.io/badge/🌐_Live-common--test.s0u7a.f5.si-111111)](https://common-test.s0u7a.f5.si)
 ![React](https://img.shields.io/badge/React-20232a?logo=react&logoColor=61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)
@@ -145,7 +145,7 @@ cd /home/s0u7a/projects/quest-pwa
 npm ci
 npm run db:migrate:remote
 npm run build:cloudflare
-npm run deploy -- --prebuilt --mode production --secrets-file .deploy/secrets.json --tag v0.5.2
+npm run deploy -- --prebuilt --mode production --secrets-file .deploy/secrets.json --tag v0.6.0
 ```
 
 初回は `cf deploy --prebuilt --mode production --secrets-file .deploy/secrets.json` で `ENCRYPTION_KEY` を登録した。以後も同じファイルの鍵を引き継ぐ。`.deploy/secrets.json` はPC上の保護ファイルで、ZIPには含めない。暗号鍵を交換すると保存済みBYOKを復号できなくなる。別アカウントへ配置するときは本番設定のaccountId・D1 ID・Queue・APP_ORIGINを変更する。`cf`がPATHにない端末で直接コマンドを使う場合は `/home/s0u7a/.bun/bin/cf` を指定する。
